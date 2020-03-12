@@ -2,6 +2,8 @@ package fr.cned.emdsgil.suividevosfrais;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Handler;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.DatePicker.OnDateChangedListener;
@@ -35,9 +37,11 @@ public class KmActivity extends AppCompatActivity {
 		imgReturn_clic() ;
 		cmdValider_clic() ;
 		cmdPlus_clic() ;
-		cmdPlusLong_clic();
+		//cmdPlusLong_clic() ;
+		cmdPlus_hold() ;
 		cmdMoins_clic() ;
-		cmdMoinsLong_clic() ;
+		cmdMoins_hold() ;
+		//cmdMoinsLong_clic() ;
 		dat_clic() ;
 	}
 
@@ -123,8 +127,15 @@ public class KmActivity extends AppCompatActivity {
     }
 
 	/**
+	 * Version n°1 de la gestion du clic long sur les boutons + et -
+	 * cmdPlusLong_clic()
+	 * cmdMoinsLong_clic()
+	 */
+
+	/**
 	 * Sur le clic long sur le bouton plus : ajout de 10 à la quantité
 	 */
+	/**
 	private void cmdPlusLong_clic() {
 		findViewById(R.id.cmdKmPlus).setOnLongClickListener(new Button.OnLongClickListener() {
 			public boolean onLongClick(View v) {
@@ -134,11 +145,13 @@ public class KmActivity extends AppCompatActivity {
 			}
 		}) ;
 	}
-	
+	 */
+
 
 	/**
-	 * Sur le clic long sur le bouton moins : retrait de 10 à la quantité si c'est possible;
+	 * Sur le clic long sur le bouton moins : retrait de 10 à la quantité si c'est possible
 	 */
+	/**
 	private void cmdMoinsLong_clic() {
 		findViewById(R.id.cmdKmMoins).setOnLongClickListener(new Button.OnLongClickListener() {
 			public boolean onLongClick(View v) {
@@ -147,6 +160,60 @@ public class KmActivity extends AppCompatActivity {
 				return true;
 			}
 		}) ;
+	}
+	 */
+
+	/**
+	 * Version n°2 de la gestion du clic long: incremente et decremente de 10 en 10 en continu
+	 */
+	//handler
+	private Handler handler = new Handler();
+	//runnable pour incrementer
+	private Runnable plusRunnable = new Runnable() {
+		@Override
+		public void run() {
+			handler.removeCallbacks(plusRunnable);
+			//vérification de la pression sur le bouton +
+			if(findViewById(R.id.cmdKmPlus).isPressed()) {
+				//augmentation de 10km
+				qte+=10;
+				enregNewQte();
+				//appel de la re-verification de la pression sur cmdKmPlus après délai
+				handler.postDelayed(plusRunnable, 100);
+			}
+		}
+	};
+	//runnable pour decrementer
+	private Runnable moinsRunnable = new Runnable() {
+		@Override
+		public void run() {
+			handler.removeCallbacks(moinsRunnable);
+			//vérification de la pression sur le bouton +
+			if(findViewById(R.id.cmdKmMoins).isPressed()) {
+				//Diminution de 10km si possible
+				qte = Math.max(0, qte-10);
+				enregNewQte();
+				//appel de la re-verification de la pression sur cmdKmMoins après délai
+				handler.postDelayed(moinsRunnable, 100);
+			}
+		}
+	};
+	//appels sur clics longs
+	private void cmdPlus_hold() {
+		findViewById(R.id.cmdKmPlus).setOnLongClickListener(new Button.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				handler.postDelayed(plusRunnable, 0);
+				return true;
+			}
+		});
+	}
+	private void cmdMoins_hold() {
+		findViewById(R.id.cmdKmMoins).setOnLongClickListener(new Button.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				handler.postDelayed(moinsRunnable, 0);
+				return true;
+			}
+		});
 	}
 
 
