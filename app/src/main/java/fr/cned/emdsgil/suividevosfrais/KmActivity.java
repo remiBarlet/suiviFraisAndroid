@@ -179,7 +179,7 @@ public class KmActivity extends AppCompatActivity {
 				qte+=10;
 				enregNewQte();
 				//appel de la re-verification de la pression sur cmdKmPlus après délai
-				handler.postDelayed(plusRunnable, 100);
+				handler.postDelayed(plusRunnable, 250);
 			}
 		}
 	};
@@ -194,7 +194,7 @@ public class KmActivity extends AppCompatActivity {
 				qte = Math.max(0, qte-10);
 				enregNewQte();
 				//appel de la re-verification de la pression sur cmdKmMoins après délai
-				handler.postDelayed(moinsRunnable, 100);
+				handler.postDelayed(moinsRunnable, 250);
 			}
 		}
 	};
