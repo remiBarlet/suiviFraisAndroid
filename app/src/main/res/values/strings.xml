@@ -34,13 +34,12 @@
     <string name="icone_recap_hf">Icone du récapitulatif des frais hors forfait</string>
     <string name="icone_transfert">Icone de la commande de transfert</string>
     <string name="icone_supp_hf">Icône de suppression d\'une ligne de frais</string>
-    <string name="title_activity_login">Sign in</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="title_activity_login">Connexion</string>
+    <string name="prompt_user">Utilisateur</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="action_sign_in">Connexion</string>
     <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
+    <string name="invalid_username">Utilisateur inconnu</string>
+    <string name="invalid_password">Mot de passe erroné</string>
+    <string name="login_failed">"Echec de l'authentification"</string>
 </resources>

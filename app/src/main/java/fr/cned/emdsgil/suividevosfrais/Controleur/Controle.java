@@ -69,4 +69,16 @@ public final class Controle {
     public Profil getProfil() {
         return profil;
     }
+
+    /**
+     * Getter du nom d'utilisateur
+     * @return String : user
+     */
+    public String getUser() {return user; }
+
+    /**
+     * Getter du mot de passe
+     * @return String : pwd
+     */
+    public String getPwd() { return pwd; }
 }

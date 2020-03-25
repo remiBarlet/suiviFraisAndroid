@@ -10,15 +10,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Vue.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Vue.EtapesActivity" />
         <activity android:name=".Vue.RepasActivity" />
         <activity android:name=".Vue.NuitActivity" />
         <activity android:name=".Vue.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+
+
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
