@@ -1,4 +1,4 @@
-package fr.cned.emdsgil.suividevosfrais;
+package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,15 @@ import android.widget.ImageButton;
 
 import java.util.Hashtable;
 
+import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
+import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
+import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.R;
+import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
+
 public class MainActivity extends AppCompatActivity {
+
+    private Controle controle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setTitle("GSB : Suivi des frais");
         // récupération des informations sérialisées
-        recupSerialize();
+        //recupSerialize();
+        controle = Controle.getInstance(this);
         // chargement des méthodes événementielles
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdKm)), KmActivity.class);
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdRepas)), RepasActivity.class);
@@ -48,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
          * on cast chaque valeur dans le type attendu.
          * Seulement ensuite on affecte cet Hastable à Global.listFraisMois.
         */
-        Hashtable<?, ?> monHash = (Hashtable<?, ?>) Serializer.deSerialize(MainActivity.this);
+        Hashtable<?, ?> monHash = (Hashtable<?, ?>) Serializer.deSerialize("saveProfil", MainActivity.this);
         if (monHash != null) {
             Hashtable<Integer, FraisMois> monHashCast = new Hashtable<>();
             for (Hashtable.Entry<?, ?> entry : monHash.entrySet()) {

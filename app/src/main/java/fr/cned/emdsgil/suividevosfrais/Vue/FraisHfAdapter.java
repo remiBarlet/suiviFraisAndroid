@@ -1,22 +1,25 @@
-package fr.cned.emdsgil.suividevosfrais;
+package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-class FraisHfAdapter extends BaseAdapter {
+import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
+import fr.cned.emdsgil.suividevosfrais.Modele.FraisHf;
+import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.R;
+import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
+
+public class FraisHfAdapter extends BaseAdapter {
 
 	private final ArrayList<FraisHf> lesFrais ; // liste des frais du mois
 	private final LayoutInflater inflater ;
@@ -108,8 +111,9 @@ class FraisHfAdapter extends BaseAdapter {
 				Integer mois = ((DatePicker) ((Activity)context).findViewById(R.id.datHfRecap)).getMonth() + 1 ;
 				Integer key = annee*100+mois;
 				//suppression + mémorisation
-				Global.listFraisMois.get(key).supprFraisHf(pos);
-				Serializer.serialize(Global.listFraisMois, context);
+				Controle controle = Controle.getInstance(null);
+				controle.getProfil().getTable().get(key).supprFraisHf(pos);
+				Serializer.serialize("saveProfil", controle.getProfil().getTable(), context);
 				// rafraichit la liste visuelle
 				notifyDataSetChanged() ;
 			}

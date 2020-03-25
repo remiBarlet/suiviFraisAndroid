@@ -1,4 +1,4 @@
-package fr.cned.emdsgil.suividevosfrais;
+package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.os.Bundle;
 import android.content.Intent;
@@ -12,7 +12,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
+import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
+import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.R;
+import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
+
 public class HfActivity extends AppCompatActivity {
+
+	private Controle controle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +30,7 @@ public class HfActivity extends AppCompatActivity {
         // modification de l'affichage du DatePicker
         Global.changeAfficheDate((DatePicker) findViewById(R.id.datHf), true) ;
 		// mise à 0 du montant
+		controle = Controle.getInstance(this);
 		((EditText)findViewById(R.id.txtHf)).setText("0") ;
         // chargement des méthodes événementielles
 		imgReturn_clic() ;
@@ -62,7 +71,7 @@ public class HfActivity extends AppCompatActivity {
     	findViewById(R.id.cmdHfAjouter).setOnClickListener(new Button.OnClickListener() {
     		public void onClick(View v) {
     			enregListe() ;
-    			Serializer.serialize(Global.listFraisMois, HfActivity.this) ;
+    			Serializer.serialize("saveProfil", controle.getProfil().getTable(), HfActivity.this) ;
     			retourActivityPrincipale() ;    		
     		}
     	}) ;    	
@@ -80,11 +89,11 @@ public class HfActivity extends AppCompatActivity {
 		String motif = ((EditText)findViewById(R.id.txtHfMotif)).getText().toString() ;
 		// enregistrement dans la liste
 		Integer key = annee*100+mois ;
-		if (!Global.listFraisMois.containsKey(key)) {
+		if (!controle.getProfil().getTable().containsKey(key)) {
 			// creation du mois et de l'annee s'ils n'existent pas déjà
-			Global.listFraisMois.put(key, new FraisMois(annee, mois)) ;
+			controle.getProfil().getTable().put(key, new FraisMois(annee, mois)) ;
 		}
-		Global.listFraisMois.get(key).addFraisHf(montant, motif, jour) ;		
+		controle.getProfil().getTable().get(key).addFraisHf(montant, motif, jour) ;
 	}
 
 	/**

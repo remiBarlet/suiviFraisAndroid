@@ -1,4 +1,4 @@
-package fr.cned.emdsgil.suividevosfrais;
+package fr.cned.emdsgil.suividevosfrais.Outils;
 
 import android.content.Context;
 
@@ -9,20 +9,22 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+
 /**
  * Classe qui permet de sérialiser et désérialiser des objets
  * @author Emds
  *
  */
-abstract class Serializer {
+public abstract class Serializer {
 
 	/**
 	 * Sérialisation d'un objet
 	 * @param object Objet à sérialiser
 	 */
-	public static void serialize(Object object, Context context) {
+	public static void serialize(String filename, Object object, Context context) {
 		try {
-			FileOutputStream file = context.openFileOutput(Global.filename, Context.MODE_PRIVATE) ;
+			FileOutputStream file = context.openFileOutput(filename, Context.MODE_PRIVATE) ;
 			ObjectOutputStream oos;
 			try {
 				oos = new ObjectOutputStream(file);
@@ -44,9 +46,9 @@ abstract class Serializer {
 	 * @param context Accès au contexte de l'application
 	 * @return Objet déserialisé
 	 */
-	public static Object deSerialize(Context context) {
+	public static Object deSerialize(String filename, Context context) {
 		try {
-			FileInputStream file = context.openFileInput(Global.filename) ;
+			FileInputStream file = context.openFileInput(filename) ;
 			ObjectInputStream ois;
 			try {
 				ois = new ObjectInputStream(file);

@@ -1,4 +1,4 @@
-package fr.cned.emdsgil.suividevosfrais;
+package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,15 +15,46 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import java.util.Hashtable;
 import java.util.Locale;
 
+import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
+import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
+import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.R;
+import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
+
 public class KmActivity extends AppCompatActivity {
+
+	private Controle controle;
 
 	// informations affichées dans l'activité
 	private Integer annee ;
 	private Integer mois ;
 	private Integer qte ;
-	
+
+	private void recupProfil() {
+		annee = ((DatePicker)findViewById(R.id.datKm)).getYear() ;
+		mois = ((DatePicker)findViewById(R.id.datKm)).getMonth() + 1 ;
+		// récupération de la qte correspondant au mois actuel
+		qte = 0 ;
+		Integer key = annee*100+mois ;
+		if (controle.getProfil() != null) {
+			if (controle.getProfil().getTable().containsKey(key)) {
+				qte = controle.getProfil().getTable().get(key).getKm() ;
+			}
+		} else {
+			controle.creerProfil(new Hashtable<Integer, FraisMois>(), this);
+		}
+
+		((EditText)findViewById(R.id.txtKm)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
+	}
+
+	private void init() {
+		controle = Controle.getInstance(this);
+		recupProfil();
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,7 +63,8 @@ public class KmActivity extends AppCompatActivity {
 		// modification de l'affichage du DatePicker
 		Global.changeAfficheDate((DatePicker) findViewById(R.id.datKm), false) ;
 		// valorisation des propriétés
-		valoriseProprietes() ;
+		//valoriseProprietes() ;
+		init();
         // chargement des méthodes événementielles
 		imgReturn_clic() ;
 		cmdValider_clic() ;
@@ -65,6 +97,7 @@ public class KmActivity extends AppCompatActivity {
     /**
 	 * Valorisation des propriétés avec les informations affichées
 	 */
+    /**
 	private void valoriseProprietes() {
 		annee = ((DatePicker)findViewById(R.id.datKm)).getYear() ;
 		mois = ((DatePicker)findViewById(R.id.datKm)).getMonth() + 1 ;
@@ -75,7 +108,7 @@ public class KmActivity extends AppCompatActivity {
 			qte = Global.listFraisMois.get(key).getKm() ;
 		}
 		((EditText)findViewById(R.id.txtKm)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
-	}
+	}*/
 	
 	/**
 	 * Sur la selection de l'image : retour au menu principal
@@ -94,7 +127,7 @@ public class KmActivity extends AppCompatActivity {
     private void cmdValider_clic() {
     	findViewById(R.id.cmdKmValider).setOnClickListener(new Button.OnClickListener() {
     		public void onClick(View v) {
-    			Serializer.serialize(Global.listFraisMois, KmActivity.this) ;
+    			Serializer.serialize("saveProfil", controle.getProfil().getTable(), KmActivity.this) ;
     			retourActivityPrincipale() ;    		
     		}
     	}) ;    	
@@ -227,7 +260,8 @@ public class KmActivity extends AppCompatActivity {
     	uneDate.init(uneDate.getYear(), uneDate.getMonth(), uneDate.getDayOfMonth(), new OnDateChangedListener(){
 			@Override
 			public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-				valoriseProprietes() ;				
+				//valoriseProprietes() ;
+				recupProfil();
 			}
     	});       	
     }
@@ -240,11 +274,11 @@ public class KmActivity extends AppCompatActivity {
 		((EditText)findViewById(R.id.txtKm)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
 		// enregistrement dans la liste
 		Integer key = annee*100+mois ;
-		if (!Global.listFraisMois.containsKey(key)) {
+		if (!controle.getProfil().getTable().containsKey(key)) {
 			// creation du mois et de l'annee s'ils n'existent pas déjà
-			Global.listFraisMois.put(key, new FraisMois(annee, mois)) ;
+			controle.getProfil().getTable().put(key, new FraisMois(annee, mois)) ;
 		}
-		Global.listFraisMois.get(key).setKm(qte) ;		
+		controle.getProfil().getTable().get(key).setKm(qte) ;
 	}
 
 	/**

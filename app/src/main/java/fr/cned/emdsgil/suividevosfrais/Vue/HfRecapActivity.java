@@ -1,4 +1,4 @@
-package fr.cned.emdsgil.suividevosfrais;
+package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,13 +14,21 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
+import fr.cned.emdsgil.suividevosfrais.Modele.FraisHf;
+import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.R;
+
 public class HfRecapActivity extends AppCompatActivity {
+
+	private Controle controle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hf_recap);
         setTitle("GSB : Récap Frais HF");
+		this.controle = Controle.getInstance(null);
 		// modification de l'affichage du DatePicker
 		Global.changeAfficheDate((DatePicker) findViewById(R.id.datHfRecap), false) ;
 		// valorisation des propriétés
@@ -55,9 +63,9 @@ public class HfRecapActivity extends AppCompatActivity {
 		// récupération des frais HF pour cette date
 		Integer key = annee*100 + mois ;
 		ArrayList<FraisHf> liste;
-		if (Global.listFraisMois.containsKey(key)) {
-			liste = Global.listFraisMois.get(key).getLesFraisHf() ;
-		}else{
+		if (controle.getProfil().getTable().containsKey(key)) {
+			liste = controle.getProfil().getTable().get(key).getLesFraisHf() ;
+		} else {
 			liste = new ArrayList<>() ;
 			/* Retrait du type de l'ArrayList (Optimisation Android Studio)
 			 * Original : Typage explicit =

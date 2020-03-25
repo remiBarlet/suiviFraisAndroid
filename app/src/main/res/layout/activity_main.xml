@@ -8,8 +8,8 @@
     android:layout_alignParentTop="true"
     android:orientation="vertical"
     android:weightSum="1"
-    tools:context=".MainActivity"
-    tools:menu="@menu/main_menu">
+    tools:context=".Vue.MainActivity"
+    tools:menu="@menu/main">
 
     <LinearLayout
         android:layout_width="match_parent"
