@@ -18,12 +18,13 @@ import java.util.Locale;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
-import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
 
 public class RepasActivity extends AppCompatActivity {
 
+    //instance de la classe Controle qui permet d'accéder au controleur
     private Controle controle;
 
     //informations affichées dans l'activité
@@ -31,6 +32,9 @@ public class RepasActivity extends AppCompatActivity {
     private Integer mois ;
     private Integer qte ;
 
+    /**
+     * Récupération des variables du profil de l'instance unique du controle pour affichage
+     */
     private void recupProfil() {
         annee = ((DatePicker)findViewById(R.id.datRepas)).getYear() ;
         mois = ((DatePicker)findViewById(R.id.datRepas)).getMonth() + 1 ;
@@ -48,6 +52,9 @@ public class RepasActivity extends AppCompatActivity {
         ((EditText)findViewById(R.id.txtRepas)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
     }
 
+    /**
+     * Initialisation du controleur
+     */
     private void init() {
         controle = Controle.getInstance(this);
         recupProfil();
@@ -59,9 +66,8 @@ public class RepasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_repas);
         setTitle("GSB: Frais de repas");
         // modification de l'affichage du DatePicker
-        Global.changeAfficheDate((DatePicker) findViewById(R.id.datRepas), false) ;
+        mesOutils.changeAfficheDate((DatePicker) findViewById(R.id.datRepas), false) ;
         // valorisation des propriétés
-        //valoriseProprietes() ;
         init();
         // chargement des méthodes événementielles
         imgReturn_clic() ;
@@ -88,23 +94,6 @@ public class RepasActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    /**
-     * Valorisation des propriétés avec les informations affichées
-     */
-    /**
-    private void valoriseProprietes() {
-        annee = ((DatePicker)findViewById(R.id.datRepas)).getYear() ;
-        mois = ((DatePicker)findViewById(R.id.datRepas)).getMonth() + 1 ;
-        // récupération de la qte correspondant au mois actuel
-        qte = 0 ;
-        Integer key = annee*100+mois ;
-        if (Global.listFraisMois.containsKey(key)) {
-            qte = Global.listFraisMois.get(key).getRepas() ;
-        }
-        ((EditText)findViewById(R.id.txtRepas)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
-    }*/
 
     /**
      * Sur la selection de l'image : retour au menu principal

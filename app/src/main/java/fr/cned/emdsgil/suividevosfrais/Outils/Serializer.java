@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import fr.cned.emdsgil.suividevosfrais.Modele.Global;
-
 /**
  * Classe qui permet de sérialiser et désérialiser des objets
  * @author Emds

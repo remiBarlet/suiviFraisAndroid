@@ -16,11 +16,12 @@ import java.util.ArrayList;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisHf;
-import fr.cned.emdsgil.suividevosfrais.Modele.Global;
+import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 
 public class HfRecapActivity extends AppCompatActivity {
 
+	//instance de la classe Controle qui permet d'accéder au controleur
 	private Controle controle;
 
 	@Override
@@ -30,7 +31,7 @@ public class HfRecapActivity extends AppCompatActivity {
         setTitle("GSB : Récap Frais HF");
 		this.controle = Controle.getInstance(null);
 		// modification de l'affichage du DatePicker
-		Global.changeAfficheDate((DatePicker) findViewById(R.id.datHfRecap), false) ;
+		mesOutils.changeAfficheDate((DatePicker) findViewById(R.id.datHfRecap), false) ;
 		// valorisation des propriétés
 		afficheListe() ;
         // chargement des méthodes événementielles
@@ -67,11 +68,6 @@ public class HfRecapActivity extends AppCompatActivity {
 			liste = controle.getProfil().getTable().get(key).getLesFraisHf() ;
 		} else {
 			liste = new ArrayList<>() ;
-			/* Retrait du type de l'ArrayList (Optimisation Android Studio)
-			 * Original : Typage explicit =
-			 * liste = new ArrayList<FraisHf>() ;
-			*/
-			// insertion dans la listview
 		}
 		ListView listView = (ListView) findViewById(R.id.lstHfRecap);
 		FraisHfAdapter adapter = new FraisHfAdapter(HfRecapActivity.this, liste) ;

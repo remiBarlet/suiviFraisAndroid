@@ -8,17 +8,12 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-
-import java.util.Hashtable;
-
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
-import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
-import fr.cned.emdsgil.suividevosfrais.Modele.Global;
 import fr.cned.emdsgil.suividevosfrais.R;
-import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
 
 public class MainActivity extends AppCompatActivity {
 
+    //instance de la classe Controle qui permet d'accéder au controleur
     private Controle controle;
 
     @Override
@@ -26,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("GSB : Suivi des frais");
+        // instanciation du controleur
         // récupération des informations sérialisées
-        //recupSerialize();
         controle = Controle.getInstance(this);
         // chargement des méthodes événementielles
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdKm)), KmActivity.class);
@@ -47,34 +42,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Récupère la sérialisation si elle existe
-     */
-    private void recupSerialize() {
-        /* Pour éviter le warning "Unchecked cast from Object to Hash" produit par un casting direct :
-         * Global.listFraisMois = (Hashtable<Integer, FraisMois>) Serializer.deSerialize(Global.filename, MainActivity.this);
-         * On créé un Hashtable générique <?,?> dans lequel on récupère l'Object retourné par la méthode deSerialize, puis
-         * on cast chaque valeur dans le type attendu.
-         * Seulement ensuite on affecte cet Hastable à Global.listFraisMois.
-        */
-        Hashtable<?, ?> monHash = (Hashtable<?, ?>) Serializer.deSerialize("saveProfil", MainActivity.this);
-        if (monHash != null) {
-            Hashtable<Integer, FraisMois> monHashCast = new Hashtable<>();
-            for (Hashtable.Entry<?, ?> entry : monHash.entrySet()) {
-                monHashCast.put((Integer) entry.getKey(), (FraisMois) entry.getValue());
-            }
-            Global.listFraisMois = monHashCast;
-        }
-        // si rien n'a été récupéré, il faut créer la liste
-        if (Global.listFraisMois == null) {
-            Global.listFraisMois = new Hashtable<>();
-            /* Retrait du type de l'HashTable (Optimisation Android Studio)
-			 * Original : Typage explicit =
-			 * Global.listFraisMois = new Hashtable<Integer, FraisMois>();
-			*/
-
-        }
-    }
 
     /**
      * Sur la sélection d'un bouton dans l'activité principale ouverture de l'activité correspondante

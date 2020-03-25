@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Vue.EtapesActivity"></activity>
+        <activity android:name=".Vue.EtapesActivity" />
         <activity android:name=".Vue.RepasActivity" />
         <activity android:name=".Vue.NuitActivity" />
         <activity android:name=".Vue.MainActivity">

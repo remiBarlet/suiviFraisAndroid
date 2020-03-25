@@ -11,7 +11,9 @@ import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
 
 public final class Controle {
 
+    //Unique instance du controleur
     private static Controle instance;
+
     //login/password permettant l'accès à l'appli
     //initialisation user/pwd en attendant la connexion à la base distante
     private static String user = "lvillachane";
@@ -26,7 +28,6 @@ public final class Controle {
      * @param context le contexte
      */
     private static void recupSerialize (Context context) {
-        //profil = (Profil) Serializer.deSerialize(filename, context);
         Hashtable table = (Hashtable) Serializer.deSerialize(filename, context);
         profil = new Profil(table, context);
     }
@@ -52,15 +53,19 @@ public final class Controle {
     }
 
     /**
-     * Creation du profil
-     *
-     *
+     * Creation du profil : initialise la propriété profil de l'instance
+     * @param liste : le hashtable <Integer, FraisMois>
+     *              qui lie la période (key annee/mois) à un FraisMois
      * @param context
      */
     public void creerProfil(Hashtable<Integer, FraisMois> liste, Context context) {
         this.profil = new Profil(liste, context);
     }
 
+    /**
+     * Getter du profil concervé par l'instance
+     * @return profil : le profil unique
+     */
     public Profil getProfil() {
         return profil;
     }
