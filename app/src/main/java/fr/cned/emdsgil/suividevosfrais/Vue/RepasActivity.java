@@ -13,11 +13,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Hashtable;
 import java.util.Locale;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
+import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
 import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
@@ -41,14 +45,17 @@ public class RepasActivity extends AppCompatActivity {
         // récupération de la qte correspondant au mois actuel
         qte = 0 ;
         Integer key = annee*100+mois ;
-        if (controle.getProfil() != null) {
-            if (controle.getProfil().getTable().containsKey(key)) {
-                qte = controle.getProfil().getTable().get(key).getRepas() ;
-            }
-        } else {
-            controle.creerProfil(new Hashtable<Integer, FraisMois>(), this);
+        AccesServeur acces = new AccesServeur();
+        String[]retourServeur = acces.run("recupRepas", controle.getProfil().getUserId(), ""+key);
+        try {
+            //Si la BDD n'a pas de resultat pour les kilometrages pour le mois passé en paramètre,
+            //le serveur renvoie false pour retourServeur[1], qte reste à 0
+            JSONObject infosQte = new JSONObject(retourServeur[1]);
+            qte = Integer.valueOf(infosQte.getString("quantite"));
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
         }
-
         ((EditText)findViewById(R.id.txtRepas)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
     }
 
@@ -67,6 +74,7 @@ public class RepasActivity extends AppCompatActivity {
         setTitle("GSB: Frais de repas");
         // modification de l'affichage du DatePicker
         mesOutils.changeAfficheDate((DatePicker) findViewById(R.id.datRepas), false) ;
+        mesOutils.limiteDateToday((DatePicker) findViewById(R.id.datRepas));
         // valorisation des propriétés
         init();
         // chargement des méthodes événementielles
@@ -112,7 +120,7 @@ public class RepasActivity extends AppCompatActivity {
     private void cmdValider_clic() {
         findViewById(R.id.cmdRepasValider).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                Serializer.serialize("saveProfil", controle.getProfil().getTable(), RepasActivity.this) ;
+                enregNewQte();
                 retourActivityPrincipale() ;
             }
         }) ;
@@ -126,7 +134,7 @@ public class RepasActivity extends AppCompatActivity {
         findViewById(R.id.cmdRepasPlus).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 qte+=1 ;
-                enregNewQte() ;
+                afficheNewQte();
             }
         }) ;
     }
@@ -139,7 +147,7 @@ public class RepasActivity extends AppCompatActivity {
         findViewById(R.id.cmdRepasMoins).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 qte = Math.max(0, qte-1) ; // suppression de 10 si possible
-                enregNewQte() ;
+                afficheNewQte();
             }
         }) ;
     }
@@ -151,7 +159,7 @@ public class RepasActivity extends AppCompatActivity {
          findViewById(R.id.cmdRepasPlus).setOnLongClickListener(new Button.OnLongClickListener() {
              public boolean onLongClick(View v) {
                  qte += 10;
-                 enregNewQte();
+                 afficheNewQte();
                  return true;
              }
          });
@@ -165,7 +173,7 @@ public class RepasActivity extends AppCompatActivity {
          findViewById(R.id.cmdRepasMoins).setOnLongClickListener(new Button.OnLongClickListener() {
              public boolean onLongClick(View v) {
                  qte = Math.max(0, qte - 10); // suppression de 10 si possible
-                 enregNewQte();
+                 afficheNewQte();
                  return true;
              }
          });
@@ -186,18 +194,23 @@ public class RepasActivity extends AppCompatActivity {
     }
 
     /**
+     * Enregistrement dans la zone de texte de la nouvelle quantité
+     */
+    private void afficheNewQte() {
+        // enregistrement dans la zone de texte
+        ((EditText)findViewById(R.id.txtRepas)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
+    }
+
+    /**
      * Enregistrement dans la zone de texte et dans la liste de la nouvelle qte, à la date choisie
      */
     private void enregNewQte() {
-        // enregistrement dans la zone de texte
-        ((EditText)findViewById(R.id.txtRepas)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
         // enregistrement dans la liste
         Integer key = annee*100+mois ;
-        if (!controle.getProfil().getTable().containsKey(key)) {
-            // creation du mois et de l'annee s'ils n'existent pas déjà
-            controle.getProfil().getTable().put(key, new FraisMois(annee, mois)) ;
-        }
-        controle.getProfil().getTable().get(key).setRepas(qte) ;
+        AccesServeur acces = new AccesServeur();
+        //transformation du message en JSON
+        String message = mesOutils.keyQteToJSON(key, qte);
+        acces.run("setRepas", controle.getProfil().getUserId(), message);
     }
 
     /**

@@ -13,11 +13,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Hashtable;
 import java.util.Locale;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
+import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
 import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
@@ -41,14 +45,17 @@ public class NuitActivity extends AppCompatActivity {
         // récupération de la qte correspondant au mois actuel
         qte = 0 ;
         Integer key = annee*100+mois ;
-        if (controle.getProfil() != null) {
-            if (controle.getProfil().getTable().containsKey(key)) {
-                qte = controle.getProfil().getTable().get(key).getNuitee() ;
-            }
-        } else {
-            controle.creerProfil(new Hashtable<Integer, FraisMois>(), this);
+        AccesServeur acces = new AccesServeur();
+        String[]retourServeur = acces.run("recupNuitee", controle.getProfil().getUserId(), ""+key);
+        try {
+            //Si la BDD n'a pas de resultat pour les kilometrages pour le mois passé en paramètre,
+            //le serveur renvoie false pour retourServeur[1], qte reste à 0
+            JSONObject infosQte = new JSONObject(retourServeur[1]);
+            qte = Integer.valueOf(infosQte.getString("quantite"));
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
         }
-
         ((EditText)findViewById(R.id.txtNuitee)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
     }
 
@@ -68,6 +75,7 @@ public class NuitActivity extends AppCompatActivity {
         setTitle("GSB: Frais de nuitées");
         // modification de l'affichage du DatePicker
         mesOutils.changeAfficheDate((DatePicker) findViewById(R.id.datNuitee), false) ;
+        mesOutils.limiteDateToday((DatePicker) findViewById(R.id.datNuitee));
         // valorisation des propriétés
         //valoriseProprietes() ;
         init();
@@ -114,7 +122,7 @@ public class NuitActivity extends AppCompatActivity {
     private void cmdValider_clic() {
         findViewById(R.id.cmdNuiteeValider).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                Serializer.serialize("saveProfil", controle.getProfil().getTable(), NuitActivity.this) ;
+                enregNewQte();
                 retourActivityPrincipale() ;
             }
         }) ;
@@ -128,7 +136,7 @@ public class NuitActivity extends AppCompatActivity {
         findViewById(R.id.cmdNuiteePlus).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 qte+=1 ;
-                enregNewQte() ;
+                afficheNewQte();
             }
         }) ;
     }
@@ -141,7 +149,7 @@ public class NuitActivity extends AppCompatActivity {
         findViewById(R.id.cmdNuiteeMoins).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 qte = Math.max(0, qte-1) ; // suppression de 10 si possible
-                enregNewQte() ;
+                afficheNewQte();
             }
         }) ;
     }
@@ -153,7 +161,7 @@ public class NuitActivity extends AppCompatActivity {
         findViewById(R.id.cmdNuiteePlus).setOnLongClickListener(new Button.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 qte += 10;
-                enregNewQte();
+                afficheNewQte();
                 return true;
             }
         });
@@ -167,7 +175,7 @@ public class NuitActivity extends AppCompatActivity {
         findViewById(R.id.cmdNuiteeMoins).setOnLongClickListener(new Button.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 qte = Math.max(0, qte - 10); // suppression de 10 si possible
-                enregNewQte();
+                afficheNewQte();
                 return true;
             }
         });
@@ -188,18 +196,23 @@ public class NuitActivity extends AppCompatActivity {
     }
 
     /**
+     * Enregistrement dans la zone de texte de la nouvelle quantité
+     */
+    private void afficheNewQte() {
+        // enregistrement dans la zone de texte
+        ((EditText)findViewById(R.id.txtNuitee)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
+    }
+
+    /**
      * Enregistrement dans la zone de texte et dans la liste de la nouvelle qte, à la date choisie
      */
     private void enregNewQte() {
-        // enregistrement dans la zone de texte
-        ((EditText)findViewById(R.id.txtNuitee)).setText(String.format(Locale.FRANCE, "%d", qte)) ;
         // enregistrement dans la liste
         Integer key = annee*100+mois ;
-        if (!controle.getProfil().getTable().containsKey(key)) {
-            // creation du mois et de l'annee s'ils n'existent pas déjà
-            controle.getProfil().getTable().put(key, new FraisMois(annee, mois)) ;
-        }
-        controle.getProfil().getTable().get(key).setNuitee(qte) ;
+        AccesServeur acces = new AccesServeur();
+        //transformation du message en JSON
+        String message = mesOutils.keyQteToJSON(key, qte);
+        acces.run("setNuitee", controle.getProfil().getUserId(), message);
     }
 
     /**

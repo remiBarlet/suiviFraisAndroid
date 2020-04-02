@@ -2,6 +2,7 @@ package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import java.util.Locale;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisHf;
+import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
 import fr.cned.emdsgil.suividevosfrais.R;
 import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
 
@@ -95,7 +97,7 @@ public class FraisHfAdapter extends BaseAdapter {
 			holder = (ViewHolder)convertView.getTag();
 		}
 		// valorisation des propriétés de holder avec le frais en position 'index' dans lesFrais
-		holder.txtListJour.setText(String.format(Locale.FRANCE, "%d", lesFrais.get(index).getJour()));
+		holder.txtListJour.setText(lesFrais.get(index).getDate());
 		holder.txtListMontant.setText(String.format(Locale.FRANCE, "%.2f", lesFrais.get(index).getMontant())) ;
 		holder.txtListMotif.setText(lesFrais.get(index).getMotif()) ;
 		// mémorisation de l'indice de ligne en étiquette de cmdSuppHf pour ensuite récupérer cet indice dans l'événement
@@ -110,11 +112,19 @@ public class FraisHfAdapter extends BaseAdapter {
 				Integer mois = ((DatePicker) ((Activity)context).findViewById(R.id.datHfRecap)).getMonth() + 1 ;
 				Integer key = annee*100+mois;
 				//suppression + mémorisation
+				AccesServeur acces = new AccesServeur();
 				Controle controle = Controle.getInstance(null);
-				controle.getProfil().getTable().get(key).supprFraisHf(pos);
-				Serializer.serialize("saveProfil", controle.getProfil().getTable(), context);
+				acces.run("deleteHf", controle.getProfil().getUserId(), lesFrais.get(pos).getIdUnique().toString());
+				Intent intent = new Intent(context, HfRecapActivity.class);
+				intent.putExtra("annee",annee);
+				intent.putExtra("mois",mois);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+				context.startActivity(intent);
+				//Controle controle = Controle.getInstance(null);
+				//controle.getProfil().getTable().get(key).supprFraisHf(pos);
+				//Serializer.serialize("saveProfil", controle.getProfil().getTable(), context);
 				// rafraichit la liste visuelle
-				notifyDataSetChanged() ;
+				//notifyDataSetChanged() ;
 			}
 		}) ;
 		return convertView ;

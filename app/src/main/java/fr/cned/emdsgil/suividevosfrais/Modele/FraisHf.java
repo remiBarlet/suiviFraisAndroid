@@ -11,12 +11,20 @@ public class FraisHf  implements Serializable {
 	//propriétés du Frais hors forfait
 	private final Float montant ;
 	private final String motif ;
-	private final Integer jour ;
+	private final String date ;
+	private final Integer idUnique;
 
-	public FraisHf(Float montant, String motif, Integer jour) {
+	/**
+	 * Constructeur
+	 * @param montant
+	 * @param motif
+	 * @param date
+	 */
+	public FraisHf(Integer idUnique, Float montant, String motif, String date) {
+		this.idUnique = idUnique;
 		this.montant = montant ;
 		this.motif = motif ;
-		this.jour = jour ;
+		this.date = date ;
 	}
 
 	/**
@@ -39,8 +47,9 @@ public class FraisHf  implements Serializable {
 	 * Getter du jour du frais
 	 * @return Integer : le jour du frais
 	 */
-	public Integer getJour() {
-		return jour;
+	public String getDate() {
+		return date;
 	}
 
+	public Integer getIdUnique() { return idUnique; }
 }

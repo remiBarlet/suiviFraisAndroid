@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisMois;
+import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
 import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 import fr.cned.emdsgil.suividevosfrais.Outils.Serializer;
@@ -27,9 +28,10 @@ public class HfActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hf);
-        setTitle("GSB : Frais HF");
+        setTitle("GSB : Frais hors forfait");
         // modification de l'affichage du DatePicker
         mesOutils.changeAfficheDate((DatePicker) findViewById(R.id.datHf), true) ;
+        mesOutils.limiteDateToday((DatePicker) findViewById(R.id.datHf));
 		// mise à 0 du montant
 		controle = Controle.getInstance(this);
 		((EditText)findViewById(R.id.txtHf)).setText("0") ;
@@ -71,8 +73,7 @@ public class HfActivity extends AppCompatActivity {
     private void cmdAjouter_clic() {
     	findViewById(R.id.cmdHfAjouter).setOnClickListener(new Button.OnClickListener() {
     		public void onClick(View v) {
-    			enregListe() ;
-    			Serializer.serialize("saveProfil", controle.getProfil().getTable(), HfActivity.this) ;
+    			enregBDD() ;
     			retourActivityPrincipale() ;    		
     		}
     	}) ;    	
@@ -81,20 +82,20 @@ public class HfActivity extends AppCompatActivity {
 	/**
 	 * Enregistrement dans la liste du nouveau frais hors forfait
 	 */
-	private void enregListe() {
+	private void enregBDD() {
 		// récupération des informations saisies
 		Integer annee = ((DatePicker)findViewById(R.id.datHf)).getYear() ;
 		Integer mois = ((DatePicker)findViewById(R.id.datHf)).getMonth() + 1 ;
 		Integer jour = ((DatePicker)findViewById(R.id.datHf)).getDayOfMonth() ;
+		String date = annee.toString() + '-' + mois.toString() + '-' + jour.toString();
 		Float montant = Float.valueOf((((EditText)findViewById(R.id.txtHf)).getText().toString()));
 		String motif = ((EditText)findViewById(R.id.txtHfMotif)).getText().toString() ;
 		// enregistrement dans la liste
 		Integer key = annee*100+mois ;
-		if (!controle.getProfil().getTable().containsKey(key)) {
-			// creation du mois et de l'annee s'ils n'existent pas déjà
-			controle.getProfil().getTable().put(key, new FraisMois(annee, mois)) ;
-		}
-		controle.getProfil().getTable().get(key).addFraisHf(montant, motif, jour) ;
+		String message = "{\"0\":\"" + key + "\",\"1\":\"" + motif + "\",\"2\":\"" + date + "\",\"3\":\"" + montant + "\"}";
+		AccesServeur acces = new AccesServeur();
+		//transformation du message en JSON
+		acces.run("setHf", controle.getProfil().getUserId(), message);
 	}
 
 	/**

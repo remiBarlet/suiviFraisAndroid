@@ -1,8 +1,11 @@
 package fr.cned.emdsgil.suividevosfrais.Vue;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,10 +15,19 @@ import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.Gson;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Modele.FraisHf;
+import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
 import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 
@@ -28,10 +40,19 @@ public class HfRecapActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hf_recap);
-        setTitle("GSB : Récap Frais HF");
+        setTitle("GSB : Hors Forfait mensuel");
 		this.controle = Controle.getInstance(null);
 		// modification de l'affichage du DatePicker
 		mesOutils.changeAfficheDate((DatePicker) findViewById(R.id.datHfRecap), false) ;
+		Intent thisIntent = getIntent();
+		int ijour = 1;
+		int imois = thisIntent.getIntExtra("mois", 16) - 1;
+		int iannee = thisIntent.getIntExtra("annee", 0);
+		if (imois != 15) {
+			((DatePicker) findViewById(R.id.datHfRecap)).init(iannee, imois, ijour, null);
+		}
+		mesOutils.limiteDateToday((DatePicker) findViewById(R.id.datHfRecap));
+
 		// valorisation des propriétés
 		afficheListe() ;
         // chargement des méthodes événementielles
@@ -64,12 +85,30 @@ public class HfRecapActivity extends AppCompatActivity {
 		// récupération des frais HF pour cette date
 		Integer key = annee*100 + mois ;
 		ArrayList<FraisHf> liste;
-		if (controle.getProfil().getTable().containsKey(key)) {
-			liste = controle.getProfil().getTable().get(key).getLesFraisHf() ;
-		} else {
-			liste = new ArrayList<>() ;
+		AccesServeur acces = new AccesServeur();
+		String message = "{\"0\":\"" + key + "\"}";
+		String[] contenu = acces.run("recupListeHf", controle.getProfil().getUserId(), message);
+		Gson gson = new Gson();
+		List<Map> listeRecu=gson.fromJson(contenu[1],new TypeToken<List<Map>>(){}.getType());
+		liste = new ArrayList<>();
+		for (Map map: listeRecu) {
+			Integer idUnique = Integer.valueOf(map.get("id").toString());
+			Float montant = Float.parseFloat(map.get("montant").toString());
+			String motif = map.get("libelle").toString();
+			String date = map.get("date").toString().substring(8)+"/"+ mois;
+			Log.d("substring", date);
+			liste.add(new FraisHf(idUnique, montant, motif, date));
 		}
+		Collections.sort(liste, new Comparator<FraisHf>() {
+			@Override
+			public int compare(FraisHf o1, FraisHf o2) {
+				return Integer.parseInt(o1.getDate().substring(0, 2)) - Integer.parseInt(o2.getDate().substring(0, 2));
+			}
+		});
+		//enregistrement de cette liste dans le profil
+
 		ListView listView = (ListView) findViewById(R.id.lstHfRecap);
+		//utilisation de la liste du profil pour créer l'adapter à l'origine de la listView
 		FraisHfAdapter adapter = new FraisHfAdapter(HfRecapActivity.this, liste) ;
 		listView.setAdapter(adapter) ;
 	}

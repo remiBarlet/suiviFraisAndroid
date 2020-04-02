@@ -3,12 +3,16 @@ package fr.cned.emdsgil.suividevosfrais.Vue;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
+import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
+import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdNuitee)), NuitActivity.class);
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdHf)), HfActivity.class);
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdHfRecap)), HfRecapActivity.class);
-        cmdTransfert_clic();
+        cmdSortie_clic();
     }
 
     @Override
@@ -59,11 +63,16 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Cas particulier du bouton pour le transfert d'informations vers le serveur
      */
-    private void cmdTransfert_clic() {
+    private void cmdSortie_clic() {
         findViewById(R.id.cmdTransfert).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 // envoi les informations sérialisées vers le serveur
                 // en construction
+                controle.getProfil().setUserId("");
+                controle.getProfil().setUserLogin("");
+                controle.getProfil().setPwd("");
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
     }

@@ -1,7 +1,6 @@
 package fr.cned.emdsgil.suividevosfrais.Controleur;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.Hashtable;
 
@@ -16,8 +15,7 @@ public final class Controle {
 
     //login/password permettant l'accès à l'appli
     //initialisation user/pwd en attendant la connexion à la base distante
-    private static String user = "lvillachane";
-    private static String pwd = "jux7g";
+
     private static Profil profil;
 
     // fichier contenant les informations sérialisées
@@ -69,16 +67,4 @@ public final class Controle {
     public Profil getProfil() {
         return profil;
     }
-
-    /**
-     * Getter du nom d'utilisateur
-     * @return String : user
-     */
-    public String getUser() {return user; }
-
-    /**
-     * Getter du mot de passe
-     * @return String : pwd
-     */
-    public String getPwd() { return pwd; }
 }
