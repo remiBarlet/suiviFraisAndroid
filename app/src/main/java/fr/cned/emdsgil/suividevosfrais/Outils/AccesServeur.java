@@ -26,7 +26,7 @@ public class AccesServeur {
     /**
      * Constante contenant l'adresse du serveur permettant l'accès à la BDD
      */
-    private static final String  SERVERADDR = "http://51.91.77.130/GSB/accesBDDAndroid.php";
+    private static final String  SERVERADDR = "https://www1.hopto.org/accesBDDAndroid.php";
     private Controle controle;
 
     /**
