@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import fr.cned.emdsgil.suividevosfrais.Controleur.Controle;
 import fr.cned.emdsgil.suividevosfrais.Outils.AccesServeur;
+import fr.cned.emdsgil.suividevosfrais.Outils.mesOutils;
 import fr.cned.emdsgil.suividevosfrais.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -103,7 +104,12 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                if (etatLog(controle.getProfil().getUserLogin(), controle.getProfil().getPwd(), userAttempt, passwordAttempt)) {
+                Log.d("DEBUG ******** UserLogin", controle.getProfil().getUserLogin());
+                Log.d("DEBUG ********* Pwd", controle.getProfil().getPwd());
+                Log.d("DEBUG ******* userAttempt", userAttempt);
+                Log.d("DEBUG ******* pwdAttemptHashed", mesOutils.encryptSHA384(passwordAttempt));
+
+                if (etatLog(controle.getProfil().getUserLogin(), controle.getProfil().getPwd(), userAttempt, mesOutils.encryptSHA384(passwordAttempt))) {
                     allerActivityPrincipale();
                 } else {
                     ((TextView) findViewById(R.id.loginFailed)).setText(R.string.login_failed);
